@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#5b3df5">
+<meta name="description" content="Цифровой деканат будущего — концепт личного кабинета студента для конкурса MGIMO AI Challenge. Не официальный сервис вуза.">
+<title>Цифровой деканат — концепт личного кабинета студента</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4fb;--card:#fff;--ink:#17132e;--muted:#6c6886;--line:#e7e5f1;--soft:#f0eefa;--accent:#5b3df5;--accent-ink:#fff;--accent-soft:#ece8ff;--lime:#c8f169;--ok:#118a48;--ok-bg:#e4f6ea;--warn:#a8650a;--warn-bg:#fff2d9;--bad:#c62d45;--bad-bg:#fde8ec;--info:#2f5fd6;--info-bg:#e7eeff;--r:18px;--sh:0 1px 2px rgba(23,19,46,.04),0 10px 30px rgba(23,19,46,.06)}
+@media (prefers-color-scheme:dark){:root{--bg:#110e20;--card:#1b1731;--ink:#f3f1fb;--muted:#a7a2c2;--line:#2c2747;--soft:#231e3d;--accent:#8a73ff;--accent-ink:#110e20;--accent-soft:#2a2350;--ok:#4fd48a;--ok-bg:#163326;--warn:#f2b552;--warn-bg:#3a2b12;--bad:#ff7d91;--bad-bg:#3d1822;--info:#86a8ff;--info-bg:#1c2647;--sh:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.25)}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:Manrope,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+body.lock{overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:8px}
+h1,h2,h3{margin:0;line-height:1.2;letter-spacing:-.01em}
+h1{font-size:26px;font-weight:800}h2{font-size:18px;font-weight:800}h3{font-size:15px;font-weight:700}
+.muted{color:var(--muted)}.small{font-size:13px}.tiny{font-size:12px}
+.concept{background:var(--ink);color:var(--bg);font-size:12px;text-align:center;padding:6px 12px;padding-top:max(6px,env(safe-area-inset-top))}
+.concept b{color:var(--lime)}
+@media (prefers-color-scheme:dark){.concept{background:#000;color:#cfcbe6}}
+/* layout */
+.app{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 30px)}
+.side{position:sticky;top:0;height:100vh;padding:22px 16px;display:flex;flex-direction:column;gap:6px;border-right:1px solid var(--line);background:var(--card)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;padding:0 8px 16px}
+.logo{width:36px;height:36px;border-radius:11px;background:var(--accent);display:grid;place-items:center;color:#fff;position:relative;flex:none}
+.logo::after{content:"";position:absolute;right:-3px;top:-3px;width:12px;height:12px;border-radius:50%;background:var(--lime);border:2px solid var(--card)}
+.brand small{display:block;font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.02em}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{display:flex;align-items:center;gap:12px;padding:11px 12px;border:0;background:none;border-radius:12px;cursor:pointer;font-weight:600;color:var(--muted);text-align:left;position:relative}
+.nav button:hover{background:var(--soft);color:var(--ink)}
+.nav button[aria-current=page]{background:var(--accent-soft);color:var(--accent)}
+.nav .cnt{margin-left:auto;background:var(--accent);color:var(--accent-ink);font-size:11px;font-weight:800;border-radius:99px;padding:1px 7px}
+.side .me{margin-top:auto;display:flex;align-items:center;gap:10px;padding:12px;border-radius:14px;background:var(--soft)}
+.ava{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:14px;color:#fff;flex:none}
+.me .n{font-weight:700;font-size:14px;line-height:1.2}.me .g{font-size:12px;color:var(--muted)}
+.main{min-width:0;padding:22px 32px 48px;max-width:1180px;width:100%}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.top h1{flex:1}
+.iconbtn{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--card);display:grid;place-items:center;cursor:pointer;position:relative;flex:none}
+.iconbtn:hover{border-color:var(--accent)}
+.dot{position:absolute;top:6px;right:6px;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:var(--bad);color:#fff;font-size:10px;font-weight:800;display:grid;place-items:center;border:2px solid var(--card)}
+.tabbar{display:none}
+@media (max-width:880px){
+ .app{grid-template-columns:1fr}
+ .side{display:none}
+ .main{padding:14px 14px calc(92px + env(safe-area-inset-bottom))}
+ h1{font-size:22px}
+ .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:30;background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+ .tabbar button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--muted);padding:6px 0;cursor:pointer;position:relative;border-radius:12px}
+ .tabbar button[aria-current=page]{color:var(--accent)}
+ .tabbar .cnt{position:absolute;top:2px;left:calc(50% + 6px);background:var(--bad);color:#fff;font-size:10px;border-radius:99px;padding:0 5px;font-weight:800}
+}
+/* cards */
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:1050px){.g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:880px){.g2{grid-template-columns:1fr}}
+@media (max-width:520px){.g3{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--sh);min-width:0}
+.card.tight{padding:14px}
+.card-h{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.card-h h2{flex:1}
+.link{border:0;background:none;color:var(--accent);font-weight:700;cursor:pointer;padding:4px 0;font-size:14px}
+.hero{background:linear-gradient(135deg,var(--accent),#8b5cf6 60%,#b067ff);color:#fff;border:0;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-50px;top:-60px;width:220px;height:220px;border-radius:50%;background:var(--lime);opacity:.9}
+.hero>*{position:relative;z-index:1}
+.hero .muted{color:rgba(255,255,255,.82)}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+@media (max-width:640px){.quick{grid-template-columns:repeat(2,1fr)}}
+.quick button{border:0;border-radius:14px;background:rgba(255,255,255,.16);color:#fff;padding:12px;text-align:left;font-weight:700;cursor:pointer;display:flex;flex-direction:column;gap:8px;font-size:13px;backdrop-filter:blur(4px)}
+.quick button:hover{background:rgba(255,255,255,.26)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid transparent;border-radius:12px;padding:11px 16px;font-weight:700;cursor:pointer;background:var(--accent);color:var(--accent-ink);min-height:44px;transition:transform .08s}
+.btn:active{transform:scale(.98)}
+.btn.sec{background:var(--card);color:var(--ink);border-color:var(--line)}
+.btn.sec:hover{border-color:var(--accent)}
+.btn.ghost{background:none;color:var(--accent)}
+.btn.danger{background:var(--bad-bg);color:var(--bad)}
+.btn.ok{background:var(--ok);color:#fff}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
+.btn.block{width:100%}
+.row{display:flex;align-items:center;gap:10px}.wrap{flex-wrap:wrap}.between{justify-content:space-between}.grow{flex:1;min-width:0}
+.stack>*+*{margin-top:10px}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;border-radius:99px;padding:3px 10px;white-space:nowrap}
+.b-info{background:var(--info-bg);color:var(--info)}.b-ok{background:var(--ok-bg);color:var(--ok)}.b-warn{background:var(--warn-bg);color:var(--warn)}.b-bad{background:var(--bad-bg);color:var(--bad)}.b-muted{background:var(--soft);color:var(--muted)}.b-acc{background:var(--accent-soft);color:var(--accent)}
+.list{display:flex;flex-direction:column}
+.item{display:flex;gap:12px;align-items:center;padding:12px 4px;border-top:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;width:100%}
+.item:first-child{border-top:0}
+.item:hover .t{color:var(--accent)}
+.item .t{font-weight:700}
+.ico{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex:none;background:var(--accent-soft);color:var(--accent)}
+.ico.ok{background:var(--ok-bg);color:var(--ok)}.ico.warn{background:var(--warn-bg);color:var(--warn)}.ico.bad{background:var(--bad-bg);color:var(--bad)}.ico.info{background:var(--info-bg);color:var(--info)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:8px 14px;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;min-height:38px}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.empty{text-align:center;padding:30px 16px;color:var(--muted)}
+.empty .big{font-size:40px;line-height:1;margin-bottom:10px}
+.empty h3{color:var(--ink);margin-bottom:4px}
+/* forms */
+label.f{display:block;font-weight:700;font-size:13px;margin-bottom:6px}
+.inp{width:100%;border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:12px 14px;min-height:46px;outline:none}
+.inp:focus{border-color:var(--accent)}
+textarea.inp{min-height:96px;resize:vertical}
+.fld{margin-bottom:14px}
+.err{color:var(--bad);font-size:13px;font-weight:600;margin-top:6px}
+.hint{color:var(--muted);font-size:12px;margin-top:5px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--soft);border-radius:12px;padding:4px;gap:4px}
+.seg button{border:0;background:none;border-radius:9px;padding:9px;font-weight:700;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed=true]{background:var(--card);color:var(--ink);box-shadow:var(--sh)}
+/* skeleton */
+.sk{background:linear-gradient(90deg,var(--soft),var(--line),var(--soft));background-size:200% 100%;animation:sk 1.1s infinite;border-radius:12px}
+@keyframes sk{to{background-position:-200% 0}}
+/* schedule */
+.lesson{display:grid;grid-template-columns:64px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.lesson:first-child{border-top:0}
+.lesson .tm{font-weight:800;font-size:14px}.lesson .tm span{display:block;font-weight:600;color:var(--muted);font-size:12px}
+.lesson .s{font-weight:700}
+.lesson.cancel .s{text-decoration:line-through;color:var(--muted)}
+.lesson.now{background:var(--accent-soft);margin:0 -12px;padding:12px;border-radius:14px;border-top-color:transparent}
+.chg{display:inline-flex;gap:6px;align-items:center;margin-top:6px;font-size:12px;font-weight:700;border-radius:8px;padding:4px 8px}
+.daycol h3{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+.daycol.today{outline:2px solid var(--accent)}
+/* progress */
+.bar{height:8px;border-radius:99px;background:var(--soft);overflow:hidden;position:relative}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--accent)}
+.bar .mark{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);opacity:.5}
+.steps{display:flex;gap:6px;margin:14px 0 6px}
+.steps div{flex:1;height:6px;border-radius:99px;background:var(--soft)}
+.steps div.on{background:var(--accent)}
+.steps-l{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-weight:600}
+.kpi .v{font-size:28px;font-weight:800;letter-spacing:-.02em}
+.code{font-size:36px;font-weight:800;letter-spacing:.3em;background:var(--lime);color:#17132e;border-radius:14px;padding:12px;text-align:center}
+.doc{background:var(--soft);border-radius:14px;padding:16px;font-family:Georgia,"Times New Roman",serif;font-size:14px;line-height:1.55;white-space:pre-wrap}
+.tl{position:relative;padding-left:22px}
+.tl>div{position:relative;padding-bottom:12px}
+.tl>div::before{content:"";position:absolute;left:-17px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.tl>div::after{content:"";position:absolute;left:-13px;top:17px;bottom:-3px;width:2px;background:var(--line)}
+.tl>div:last-child::after{display:none}
+/* chat */
+.msgs{display:flex;flex-direction:column;gap:8px;max-height:52vh;overflow-y:auto;padding:4px 2px}
+.msg{max-width:82%;padding:10px 13px;border-radius:16px;background:var(--soft);white-space:pre-wrap;word-wrap:break-word}
+.msg.mine{align-self:flex-end;background:var(--accent);color:var(--accent-ink);border-bottom-right-radius:5px}
+.msg.their{border-bottom-left-radius:5px}
+.msg .m{font-size:11px;opacity:.75;margin-top:4px}
+.faq{border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--soft)}
+/* sheet */
+#sheet[hidden]{display:none}
+#sheet{position:fixed;inset:0;z-index:50;display:grid;place-items:center}
+.sheet-bd{position:absolute;inset:0;background:rgba(10,8,25,.5);opacity:0;transition:opacity .2s}
+.sheet{position:relative;background:var(--card);border-radius:22px;width:min(620px,94vw);max-height:90vh;overflow-y:auto;padding:22px;transform:translateY(12px);opacity:0;transition:.2s}
+#sheet.open .sheet-bd{opacity:1}#sheet.open .sheet{transform:none;opacity:1}
+.sheet-h{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.sheet-h h2{flex:1;font-size:20px}
+@media (max-width:880px){#sheet{place-items:end center}.sheet{width:100%;border-radius:22px 22px 0 0;max-height:92vh;padding:18px 16px calc(18px + env(safe-area-inset-bottom))}.sheet::before{content:"";display:block;width:40px;height:4px;border-radius:9px;background:var(--line);margin:-6px auto 12px}}
+.toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:24px;z-index:60;display:flex;flex-direction:column;gap:8px;width:min(440px,92vw)}
+@media (max-width:880px){.toasts{bottom:calc(86px + env(safe-area-inset-bottom))}}
+.toast{background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:14px;font-weight:600;box-shadow:var(--sh);animation:tin .2s}
+.toast.bad{background:var(--bad);color:#fff}
+@keyframes tin{from{transform:translateY(8px);opacity:0}}
+/* login */
+.login{min-height:calc(100vh - 30px);display:grid;grid-template-columns:1.1fr 1fr}
+.login .l{background:linear-gradient(160deg,#2a1a8f,#5b3df5 55%,#9b5cff);color:#fff;padding:48px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.login .l::after{content:"";position:absolute;width:340px;height:340px;border-radius:50%;background:var(--lime);right:-120px;bottom:-120px}
+.login .l>*{position:relative;z-index:1}
+.login .r{display:grid;place-items:center;padding:28px}
+.login form{width:min(400px,100%)}
+.feat{display:flex;gap:12px;align-items:flex-start;margin-top:14px;max-width:420px}
+.feat .ico{background:rgba(255,255,255,.16);color:#fff}
+@media (max-width:880px){.login{grid-template-columns:1fr}.login .l{padding:26px 20px 30px}.login .l .feats{display:none}.login .r{padding:22px 16px 40px;place-items:start center}}
+.pw{position:relative}.pw .inp{padding-right:52px}.pw button{position:absolute;right:4px;top:4px;height:38px;width:44px;border:0;background:none;cursor:pointer;color:var(--muted);border-radius:10px}
+.demo{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.demo button{border:1.5px dashed var(--line);background:none;border-radius:12px;padding:10px 6px;cursor:pointer;font-weight:700;font-size:12px;color:var(--muted)}
+.demo button:hover{border-color:var(--accent);color:var(--accent)}
+table.t{width:100%;border-collapse:collapse;font-size:14px}
+table.t th{text-align:left;color:var(--muted);font-size:12px;font-weight:700;padding:8px 6px;border-bottom:1px solid var(--line)}
+table.t td{padding:10px 6px;border-bottom:1px solid var(--line)}
+.grade{display:inline-grid;place-items:center;min-width:34px;height:30px;border-radius:9px;font-weight:800}
+.foot{margin-top:28px;font-size:12px;color:var(--muted);text-align:center}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<div class="concept" role="note"><b>Концепт для конкурса MGIMO AI Challenge</b> · не официальный сервис вуза · все данные вымышленные</div>
+<div id="root"></div>
+<div id="sheet" hidden></div>
+<div class="toasts" aria-live="polite" id="toasts"></div>
+<script>
+'use strict';
+/* ============ утилиты ============ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const DAY=864e5,HOUR=36e5;
+const fmtD=(t,o={day:'numeric',month:'long'})=>new Date(t).toLocaleDateString('ru-RU',o);
+const fmtT=t=>new Date(t).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+const fmtDT=t=>{const d=new Date(t),n=new Date();if(d.toDateString()===n.toDateString())return'сегодня, '+fmtT(t);if(new Date(n-DAY).toDateString()===d.toDateString())return'вчера, '+fmtT(t);return fmtD(t)+', '+fmtT(t)};
+const plural=(n,a,b,c)=>{n=Math.abs(n)%100;const n1=n%10;if(n>10&&n<20)return c;if(n1>1&&n1<5)return b;if(n1===1)return a;return c};
+const startOfDay=t=>{const d=new Date(t);d.setHours(0,0,0,0);return d.getTime()};
+const mondayOf=t=>{const d=new Date(startOfDay(t));const w=(d.getDay()+6)%7;return d.getTime()-w*DAY};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const hex=b=>[...b].map(x=>x.toString(16).padStart(2,'0')).join('');
+const unhex=h=>new Uint8Array(h.match(/../g).map(x=>parseInt(x,16)));
+const rnd=n=>{const a=new Uint8Array(n);crypto.getRandomValues(a);return hex(a)};
+
+const I={home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',cal:'<rect x="3" y="4.5" width="18" height="16.5" rx="2"/><path d="M3 9.5h18M8 3v3M16 3v3"/>',cap:'<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2.5 9 2.5 12 0v-5"/>',file:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>',chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',bell:'<path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10.3 20a1.9 1.9 0 0 0 3.4 0"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',out:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',plus:'<path d="M12 5v14M5 12h14"/>',check:'<path d="M20 6 9 17l-5-5"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',x:'<path d="M18 6 6 18M6 6l12 12"/>',send:'<path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/>',mega:'<path d="M3 11v2a1 1 0 0 0 1 1h3l5 4V6L7 10H4a1 1 0 0 0-1 1zM16 8a5 5 0 0 1 0 8"/>',left:'<path d="m15 18-6-6 6-6"/>',right:'<path d="m9 18 6-6-6-6"/>',spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',alert:'<path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17h.01"/>',eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',inbox:'<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5h13L22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"/>',swap:'<path d="M7 7h13l-4-4M17 17H4l4 4"/>',lock:'<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'};
+const ic=(n,s=20)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]||''}</svg>`;
+
+/* ============ «сервер»: хранилище + API ============
+   Весь доступ к данным идёт только через объект API.
+   Каждая функция сама проверяет сессию и роль и отдаёт студенту только его записи.
+   В продакшене этот слой заменяется REST-API с той же сигнатурой. */
+const KEY='dd.db.v2',SKEY='dd.session';
+let memDB=null,memS=null;
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return k===KEY?memDB:memS}},set(k,v){try{localStorage.setItem(k,v)}catch(e){k===KEY?memDB=v:memS=v}},del(k){try{localStorage.removeItem(k)}catch(e){k===KEY?memDB=null:memS=null}}};
+let DB=null;
+function load(){if(DB)return DB;let d=null;try{d=JSON.parse(store.get(KEY))}catch(e){}if(!d||d.v!==2){d=seed();}DB=d;save();return DB}
+function save(){store.set(KEY,JSON.stringify(DB))}
+
+const PAIRS={1:['09:00','10:30'],2:['10:40','12:10'],3:['12:40','14:10'],4:['14:20','15:50'],5:['16:00','17:30']};
+const CERTS=[
+ {id:'study',t:'Справка об обучении',d:'Подтверждает, что вы студент: для работы, банка, МФЦ',days:2},
+ {id:'military',t:'Справка для военкомата',d:'Форма для отсрочки от призыва',days:3},
+ {id:'social',t:'Справка для соцзащиты',d:'Для пособий и льгот семьи',days:3},
+ {id:'scholar',t:'Справка о размере стипендии',d:'Сумма выплат за выбранный период',days:3},
+ {id:'transcript',t:'Выписка оценок',d:'Все оценки за пройденные сессии',days:5}];
+const STATEMENTS=[
+ {id:'retake',t:'Заявление на пересдачу',d:'Пересдать экзамен или зачёт в другой день',days:3,fields:[{k:'subject',l:'Дисциплина',type:'subject',req:1},{k:'reason',l:'Причина',type:'select',opts:['Болезнь (есть справка)','Участие в олимпиаде или конференции','Семейные обстоятельства','Хочу повысить оценку']}],text:(u,f)=>`Прошу разрешить мне пересдачу по дисциплине «${f.subject||'…'}» в связи с причиной: ${(f.reason||'…').toLowerCase()}.`},
+ {id:'individual',t:'Индивидуальный график',d:'Совмещать учёбу с работой, спортом или стажировкой',days:5,fields:[{k:'reason',l:'Основание',type:'select',opts:['Работа по специальности','Спортивные сборы','Стажировка','Состояние здоровья']},{k:'period',l:'На какой срок',type:'select',opts:['До конца семестра','До конца учебного года']}],text:(u,f)=>`Прошу установить мне индивидуальный график обучения ${(f.period||'до конца семестра').toLowerCase()}. Основание: ${(f.reason||'…').toLowerCase()}.`},
+ {id:'aid',t:'Материальная помощь',d:'Разовая выплата в трудной ситуации',days:7,fields:[{k:'reason',l:'Основание',type:'select',opts:['Сложное материальное положение','Лечение','Рождение ребёнка','Другое']},{k:'comment',l:'Коротко опишите ситуацию',type:'textarea'}],text:(u,f)=>`Прошу оказать мне материальную помощь. Основание: ${(f.reason||'…').toLowerCase()}.${f.comment?' '+f.comment:''}`},
+ {id:'card',t:'Восстановление студенческого',d:'Если билет потерян или испорчен',days:5,fields:[{k:'reason',l:'Что случилось',type:'select',opts:['Утерян','Испорчен','Смена фамилии']}],text:(u,f)=>`Прошу выдать мне дубликат студенческого билета. Причина: ${(f.reason||'…').toLowerCase()}.`}];
+const typeOf=id=>CERTS.find(c=>c.id===id)||STATEMENTS.find(c=>c.id===id);
+const ST={cert:{new:['Принята','info'],work:['Готовится','warn'],ready:['Готова к выдаче','ok'],done:['Выдана','muted'],rejected:['Отклонена','bad'],cancelled:['Отменена','muted']},
+ st:{new:['Подано','info'],work:['На рассмотрении','warn'],ready:['Одобрено','ok'],done:['Исполнено','muted'],rejected:['Отклонено','bad'],cancelled:['Отозвано','muted']}};
+const STEPS={cert:['Принята','Готовится','Готова','Выдана'],st:['Подано','Рассмотрение','Решение','Исполнено']};
+const stepIdx={new:0,work:1,ready:2,done:3,rejected:2,cancelled:0};
+const FAQ=[
+ {k:['стипенд'],q:'Когда приходит стипендия?',a:'Стипендия приходит до 25-го числа каждого месяца на карту, указанную в профиле. Справку о размере стипендии можно заказать в «Заявках», она готовится за 3 дня.'},
+ {k:['справк','военкомат','обучени'],q:'Как получить справку?',a:'Закажите её в разделе «Заявки → Справка». Когда справка будет готова, придёт уведомление и код выдачи. Покажите код в каб. 214, очередь не нужна.'},
+ {k:['пересда','экзамен','долг','задолж'],q:'Как пересдать экзамен?',a:'Подайте «Заявление на пересдачу» в разделе «Заявки». Дату согласует кафедра, она появится в расписании и в уведомлениях.'},
+ {k:['расписан','пара','перенос','аудитор'],q:'Где смотреть изменения в расписании?',a:'Переносы и замены отмечены прямо в расписании цветом, а ещё приходят в уведомления. Ничего искать в чатах не нужно.'},
+ {k:['студенческ','билет','пропуск'],q:'Потерял студенческий билет',a:'Подайте заявление «Восстановление студенческого» в «Заявках», дубликат готовят за 5 рабочих дней.'},
+ {k:['общежит'],q:'Как заселиться в общежитие?',a:'Вопросы заселения решает отдел по работе с общежитиями. Напишите обращение, и деканат передаст его ответственному.'}];
+
+const SUBJ_COLORS=['#5b3df5','#e0559b','#0e9f6e','#f08a24','#2f7fe0','#9b51e0','#d14343','#14a3b8'];
+function seed(){
+ const now=Date.now();
+ const users=[
+  {id:'u1',email:'student@test.ru',role:'student',last:'Смирнов',first:'Алексей',middle:'Игоревич',faculty:'Факультет экономики и управления',program:'38.03.01 Экономика',profile:'Цифровая экономика',course:2,group:'ЭК-2-04',record:'24-0417',phone:'+7 900 000-00-01',color:'#5b3df5',salt:'e3413ded45bcaa438eef5715f780330d',hash:'cf908ab82492b401e018c05eed453db98eceeb50a978b1abe6b277b7c7b5e639'},
+  {id:'u2',email:'petrova@test.ru',role:'student',last:'Петрова',first:'Мария',middle:'Андреевна',faculty:'Факультет международных отношений',program:'41.03.05 Международные отношения',profile:'Мировая политика',course:1,group:'МО-1-02',record:'26-0233',phone:'+7 900 000-00-02',color:'#e0559b',salt:'8310815dd12eaf728d10d0614aa93b12',hash:'9a2247823d0e80bc6fe7a0199cdb5350d26784da0c0c79455a07325e354b185a'},
+  {id:'s1',email:'dekanat@test.ru',role:'staff',last:'Иванова',first:'Ольга',middle:'Викторовна',position:'Специалист деканата, каб. 214',color:'#0e9f6e',salt:'6eb56893208d8963907720017682295e',hash:'c94d32c43eb170fe5f653e89d6b443f8a4d52b93a125c898fdb2314548358a09'}];
+ // расписание: [день(1-6), пара, дисциплина, тип, ауд, преподаватель, изменение на текущей неделе]
+ const sch={
+ 'ЭК-2-04':[[1,1,'Эконометрика','Лекция','312','Ковалёв Д. А.'],[1,2,'Микроэкономика','Семинар','214','Белова Т. С.'],[1,3,'Английский язык','Практика','405','Гусева О. Н.'],
+  [2,2,'Макроэкономика','Лекция','101','Орлова Н. В.'],[2,3,'Финансы','Лекция','101','Фролов С. В.'],[2,4,'Физическая культура','Практика','Спортзал','Тренер Кузин В. Л.'],
+  [3,1,'Эконометрика','Практика','207','Ковалёв Д. А.'],[3,2,'Макроэкономика','Семинар','214','Орлова Н. В.',{type:'room',text:'Аудитория изменена: 118 вместо 214',room:'118'}],[3,3,'Маркетинг','Лекция','101','Миронова Е. Г.'],
+  [4,2,'Финансы','Семинар','309','Фролов С. В.'],[4,3,'Английский язык','Практика','405','Гусева О. Н.'],[4,4,'Маркетинг','Семинар','211','Миронова Е. Г.',{type:'cancel',text:'Перенесено на пятницу, 3 пара'}],
+  [5,1,'Микроэкономика','Лекция','101','Белова Т. С.'],[5,2,'Цифровая экономика','Лекция','315','Лебедев А. Ю.',{type:'teacher',text:'Замена: ведёт Зайцев П. И.'}],[5,3,'Маркетинг','Семинар','211','Миронова Е. Г.',{type:'extra',text:'Перенос с четверга'}]],
+ 'МО-1-02':[[1,2,'История международных отношений','Лекция','101','Зайцев П. И.'],[1,3,'Иностранный язык','Практика','402','Гусева О. Н.'],
+  [2,1,'Теория международных отношений','Лекция','210','Ковалёв Д. А.'],[2,2,'Введение в политологию','Семинар','118','Орлова Н. В.'],
+  [3,2,'Мировая экономика','Лекция','315','Фролов С. В.'],[3,3,'Иностранный язык','Практика','402','Гусева О. Н.',{type:'room',text:'Аудитория изменена: 410 вместо 402',room:'410'}],
+  [4,1,'Введение в политологию','Лекция','101','Орлова Н. В.'],[4,3,'История международных отношений','Семинар','214','Зайцев П. И.'],
+  [5,2,'Теория международных отношений','Семинар','210','Ковалёв Д. А.',{type:'cancel',text:'Отменено: преподаватель на конференции'}],[6,1,'Иностранный язык','Практика','402','Гусева О. Н.']]};
+ const grades={
+ u1:{current:{name:'3 семестр · осень 2026',items:[['Эконометрика','Экзамен',41,50],['Макроэкономика','Экзамен',78,50],['Микроэкономика','Экзамен',86,50],['Финансы','Зачёт',64,60],['Маркетинг','Дифф. зачёт',72,60],['Английский язык','Зачёт',90,60],['Цифровая экономика','Зачёт',55,60]]},
+  session:[['Английский язык','Зачёт','21 декабря'],['Финансы','Зачёт','23 декабря'],['Цифровая экономика','Зачёт','25 декабря'],['Маркетинг','Дифф. зачёт','26 декабря'],['Эконометрика','Экзамен','12 января'],['Макроэкономика','Экзамен','16 января'],['Микроэкономика','Экзамен','20 января']],
+  past:[{name:'2 семестр · весна 2026',items:[['Математический анализ','Экзамен','5'],['Микроэкономика (базовый курс)','Экзамен','5'],['История России','Экзамен','4'],['Статистика','Экзамен','4'],['Английский язык','Зачёт','зачёт'],['Информатика','Зачёт','зачёт']]},{name:'1 семестр · осень 2025',items:[['Линейная алгебра','Экзамен','4'],['Введение в экономику','Экзамен','5'],['Философия','Экзамен','5'],['Английский язык','Зачёт','зачёт'],['Правоведение','Зачёт','зачёт']]}]},
+ u2:{current:{name:'1 семестр · осень 2026',items:[['История международных отношений','Экзамен',82,50],['Теория международных отношений','Экзамен',69,50],['Иностранный язык','Зачёт',93,60],['Введение в политологию','Зачёт',52,60],['Мировая экономика','Дифф. зачёт',74,60]]},
+  session:[['Иностранный язык','Зачёт','22 декабря'],['Введение в политологию','Зачёт','24 декабря'],['Мировая экономика','Дифф. зачёт','26 декабря'],['История международных отношений','Экзамен','13 января'],['Теория международных отношений','Экзамен','19 января']],past:[]}};
+ const hist=(arr)=>arr.map(([status,ago,by,comment])=>({status,at:now-ago,by,comment}));
+ const requests=[
+  {id:'1041',userId:'u1',kind:'cert',type:'study',fields:{copies:2,purpose:'В банк',format:'Бумажная'},status:'ready',code:'4821',createdAt:now-2*DAY,history:hist([['new',2*DAY,'Вы'],['work',1.6*DAY,'Деканат'],['ready',3*HOUR,'Деканат','Справка подписана. Заберите в каб. 214 с 10:00 до 17:00, покажите код.']])},
+  {id:'1044',userId:'u1',kind:'cert',type:'military',fields:{copies:1,purpose:'В военкомат',format:'Бумажная'},status:'work',createdAt:now-DAY,history:hist([['new',DAY,'Вы'],['work',20*HOUR,'Деканат']])},
+  {id:'1046',userId:'u1',kind:'st',type:'retake',fields:{subject:'Эконометрика',reason:'Участие в олимпиаде или конференции'},status:'new',createdAt:now-2*HOUR,history:hist([['new',2*HOUR,'Вы']])},
+  {id:'1045',userId:'u2',kind:'cert',type:'study',fields:{copies:1,purpose:'В МФЦ / соцзащиту',format:'Электронная'},status:'new',createdAt:now-5*HOUR,history:hist([['new',5*HOUR,'Вы']])}];
+ const threads=[
+  {id:'t1',userId:'u1',topic:'Пересдача по эконометрике',status:'open',unreadStudent:1,unreadStaff:0,updatedAt:now-5*HOUR,messages:[{from:'student',text:'Здравствуйте! 12 января у меня олимпиада, а в этот день экзамен по эконометрике. Можно ли сдать в другой день?',at:now-26*HOUR},{from:'staff',text:'Здравствуйте, Алексей! Да, подайте заявление на пересдачу в разделе «Заявки», я согласую новую дату с кафедрой.',at:now-5*HOUR}]},
+  {id:'t2',userId:'u2',topic:'Где получить студенческий билет?',status:'open',unreadStudent:0,unreadStaff:1,updatedAt:now-3*HOUR,messages:[{from:'student',text:'Добрый день! Я с первого курса, студенческий ещё не выдали. Куда подойти?',at:now-3*HOUR}]}];
+ const news=[
+  {id:'n1',title:'Повышенная стипендия: заявления до 30 ноября',text:'Подать заявление и портфолио достижений можно онлайн, в разделе «Заявки». Комиссия соберётся 2 декабря.',at:now-1*DAY,tag:'deadline'},
+  {id:'n2',title:'Опубликован график зачётной недели',text:'Даты зачётов и экзаменов уже стоят в разделе «Учёба → Сессия». Напоминания придут за 3 дня и за день.',at:now-3*DAY,tag:'news'},
+  {id:'n3',title:'4 декабря деканат работает до 15:00',text:'Готовые справки можно забрать до 15:00. Онлайн-заявки принимаются как обычно.',at:now-4*DAY,tag:'news'}];
+ const notes=[
+  {id:'a1',userId:'u1',kind:'request',title:'Справка об обучении готова',text:'Заявка №1041. Код выдачи: 4821, каб. 214.',at:now-3*HOUR,read:false,link:'request-1041'},
+  {id:'a2',userId:'u1',kind:'chat',title:'Деканат ответил на обращение',text:'«Пересдача по эконометрике»',at:now-5*HOUR,read:false,link:'chat-t1'},
+  {id:'a3',userId:'u1',kind:'change',title:'Изменения в расписании на неделе',text:'Среда: макроэкономика в ауд. 118. Маркетинг перенесён с четверга на пятницу.',at:now-8*HOUR,read:false,link:'schedule'},
+  {id:'a4',userId:'u1',kind:'deadline',title:'Эконометрика: до допуска 9 баллов',text:'Сдайте 2 домашние работы до 15 декабря, чтобы получить допуск к экзамену.',at:now-30*HOUR,read:true,link:'grades'},
+  {id:'a5',userId:'u2',kind:'change',title:'Изменения в расписании',text:'Пятница: семинар по ТМО отменён. Среда: иностранный язык в ауд. 410.',at:now-6*HOUR,read:false,link:'schedule'},
+  {id:'a6',userId:'u2',kind:'deadline',title:'Политология: до зачёта 8 баллов',text:'Подготовьте доклад до 10 декабря.',at:now-DAY,read:false,link:'grades'}];
+ return {v:2,seq:1046,users,schedule:sch,grades,requests,threads,news,notes,sessions:{},attempts:{}};
+}
+
+async function pbkdf2(pass,salt){const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveBits']);const bits=await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:unhex(salt),iterations:100000},k,256);return hex(new Uint8Array(bits))}
+class AccessError extends Error{}
+const pub=u=>{const{salt,hash,...rest}=u;return rest};
+const API={
+ _net:async()=>{await sleep(160+Math.random()*240)},
+ me(){load();const tok=store.get(SKEY);const s=tok&&DB.sessions[tok];if(!s||s.exp<Date.now()){return null}return DB.users.find(u=>u.id===s.userId)||null},
+ _auth(role){const u=API.me();if(!u)throw new AccessError('Сессия истекла, войдите снова');if(role&&u.role!==role)throw new AccessError('Недостаточно прав');return u},
+ async login(email,pass){await API._net();load();email=String(email).trim().toLowerCase();const at=DB.attempts[email]||{n:0,until:0};if(at.until>Date.now())throw new Error(`Слишком много попыток. Попробуйте через ${Math.ceil((at.until-Date.now())/1000)} с`);const u=DB.users.find(x=>x.email===email);const ok=u&&(await pbkdf2(pass,u.salt))===u.hash;if(!ok){at.n++;if(at.n>=5){at.until=Date.now()+60000;at.n=0}DB.attempts[email]=at;save();throw new Error('Неверная почта или пароль')}delete DB.attempts[email];const tok=rnd(24);DB.sessions[tok]={userId:u.id,exp:Date.now()+8*HOUR};save();store.set(SKEY,tok);return pub(u)},
+ logout(){load();const tok=store.get(SKEY);if(tok){delete DB.sessions[tok];save()}store.del(SKEY)},
+ async profile(){await API._net();return pub(API._auth())},
+ async updatePhone(phone){await API._net();const u=API._auth();if(!/^\+?[0-9 ()-]{10,18}$/.test(phone))throw new Error('Проверьте номер: только цифры, пробелы, скобки и дефисы');u.phone=phone.trim();save();return pub(u)},
+ async changePassword(cur,next){await API._net();const u=API._auth();if((await pbkdf2(cur,u.salt))!==u.hash)throw new Error('Текущий пароль указан неверно');if(next.length<8||!/\d/.test(next)||!/[a-zA-Zа-яА-Я]/.test(next))throw new Error('Новый пароль: от 8 символов, буквы и цифры');u.salt=rnd(16);u.hash=await pbkdf2(next,u.salt);const tok=store.get(SKEY);for(const k in DB.sessions)if(DB.sessions[k].userId===u.id&&k!==tok)delete DB.sessions[k];save()},
+ async schedule(){await API._net();const u=API._auth('student');return DB.schedule[u.group]||[]},
+ async grades(){await API._net();const u=API._auth('student');return DB.grades[u.id]||{current:{items:[]},session:[],past:[]}},
+ async requests(){await API._net();const u=API._auth();return(u.role==='staff'?DB.requests:DB.requests.filter(r=>r.userId===u.id)).slice().sort((a,b)=>b.createdAt-a.createdAt).map(r=>u.role==='staff'?{...r,student:pub(DB.users.find(x=>x.id===r.userId))}:r)},
+ async request(id){await API._net();const u=API._auth();const r=DB.requests.find(x=>x.id===String(id));if(!r||(u.role!=='staff'&&r.userId!==u.id))throw new AccessError('Заявка не найдена или у вас нет к ней доступа');return u.role==='staff'?{...r,student:pub(DB.users.find(x=>x.id===r.userId))}:r},
+ async createRequest(kind,type,fields){await API._net();const u=API._auth('student');const t=typeOf(type);if(!t||(kind==='cert')!==!!CERTS.find(c=>c.id===type))throw new Error('Неизвестный тип заявки');if(kind==='st')for(const f of t.fields)if(f.req&&!String(fields[f.k]||'').trim())throw new Error(`Заполните поле «${f.l}»`);const clean={};for(const k in fields)clean[k]=String(fields[k]).slice(0,600);const r={id:String(++DB.seq),userId:u.id,kind,type,fields:clean,status:'new',createdAt:Date.now(),history:[{status:'new',at:Date.now(),by:'Вы'}]};DB.requests.push(r);save();return r},
+ async cancelRequest(id){await API._net();const u=API._auth('student');const r=DB.requests.find(x=>x.id===id&&x.userId===u.id);if(!r)throw new AccessError('Заявка не найдена');if(r.status!=='new')throw new Error('Отозвать можно только заявку, которую ещё не взяли в работу');r.status='cancelled';r.history.push({status:'cancelled',at:Date.now(),by:'Вы'});save()},
+ async setStatus(id,status,comment){await API._net();API._auth('staff');const r=DB.requests.find(x=>x.id===id);if(!r)throw new Error('Заявка не найдена');if(status==='rejected'&&!comment.trim())throw new Error('Укажите причину отказа, студент её увидит');r.status=status;if(status==='ready'&&r.kind==='cert'&&!r.code)r.code=String(1000+Math.floor(Math.random()*9000));r.history.push({status,at:Date.now(),by:'Деканат',comment:comment.trim()||undefined});const lab=ST[r.kind][status][0];DB.notes.push({id:'a'+rnd(4),userId:r.userId,kind:'request',title:`${typeOf(r.type).t}: ${lab.toLowerCase()}`,text:`Заявка №${r.id}.`+(r.code&&status==='ready'?` Код выдачи: ${r.code}, каб. 214.`:'')+(comment?` ${comment}`:''),at:Date.now(),read:false,link:'request-'+r.id});save()},
+ async threads(){await API._net();const u=API._auth();const list=u.role==='staff'?DB.threads:DB.threads.filter(t=>t.userId===u.id);return list.slice().sort((a,b)=>b.updatedAt-a.updatedAt).map(t=>u.role==='staff'?{...t,student:pub(DB.users.find(x=>x.id===t.userId))}:t)},
+ async thread(id){await API._net();const u=API._auth();const t=DB.threads.find(x=>x.id===id);if(!t||(u.role!=='staff'&&t.userId!==u.id))throw new AccessError('Обращение не найдено или у вас нет к нему доступа');if(u.role==='staff')t.unreadStaff=0;else{t.unreadStudent=0;DB.notes.filter(n=>n.userId===u.id&&n.link==='chat-'+id).forEach(n=>n.read=true)}save();return u.role==='staff'?{...t,student:pub(DB.users.find(x=>x.id===t.userId))}:t},
+ async newThread(topic,text){await API._net();const u=API._auth('student');topic=topic.trim().slice(0,120);text=text.trim().slice(0,2000);if(!topic||!text)throw new Error('Заполните тему и сообщение');const t={id:'t'+rnd(4),userId:u.id,topic,status:'open',unreadStudent:0,unreadStaff:1,updatedAt:Date.now(),messages:[{from:'student',text,at:Date.now()}]};DB.threads.push(t);save();return t},
+ async send(id,text){await API._net();const u=API._auth();text=text.trim().slice(0,2000);if(!text)throw new Error('Пустое сообщение');const t=DB.threads.find(x=>x.id===id);if(!t||(u.role!=='staff'&&t.userId!==u.id))throw new AccessError('Нет доступа');const from=u.role==='staff'?'staff':'student';t.messages.push({from,text,at:Date.now()});t.updatedAt=Date.now();t.status='open';if(from==='staff'){t.unreadStudent++;DB.notes.push({id:'a'+rnd(4),userId:t.userId,kind:'chat',title:'Деканат ответил на обращение',text:`«${t.topic}»`,at:Date.now(),read:false,link:'chat-'+t.id})}else t.unreadStaff++;save()},
+ async closeThread(id){await API._net();API._auth('staff');const t=DB.threads.find(x=>x.id===id);if(t){t.status='closed';save()}},
+ async news(){await API._net();API._auth();return DB.news.slice().sort((a,b)=>b.at-a.at)},
+ async publish(title,text,tag){await API._net();API._auth('staff');title=title.trim();text=text.trim();if(!title||!text)throw new Error('Заполните заголовок и текст');const n={id:'n'+rnd(4),title,text,tag,at:Date.now()};DB.news.push(n);DB.users.filter(u=>u.role==='student').forEach(u=>DB.notes.push({id:'a'+rnd(4),userId:u.id,kind:tag==='deadline'?'deadline':'news',title,text,at:Date.now(),read:false,link:'notifications'}));save()},
+ async notes(){await API._net();const u=API._auth('student');return DB.notes.filter(n=>n.userId===u.id).sort((a,b)=>b.at-a.at)},
+ unread(){const u=API.me();if(!u)return{n:0,c:0};load();if(u.role==='staff')return{n:0,c:DB.threads.filter(t=>t.unreadStaff>0).length,r:DB.requests.filter(r=>r.status==='new').length};return{n:DB.notes.filter(x=>x.userId===u.id&&!x.read).length,c:DB.threads.filter(t=>t.userId===u.id&&t.unreadStudent>0).length}},
+ async readNote(id){const u=API._auth('student');const n=DB.notes.find(x=>x.id===id&&x.userId===u.id);if(n){n.read=true;save()}},
+ async readAll(){await API._net();const u=API._auth('student');DB.notes.filter(n=>n.userId===u.id).forEach(n=>n.read=true);save()},
+ reset(){store.del(KEY);store.del(SKEY);DB=null;load()}
+};
+
+/* ============ интерфейс ============ */
+const state={view:'home',param:null};
+const STUDENT_NAV=[['home','Главная','home'],['schedule','Расписание','cal'],['grades','Учёба','cap'],['requests','Заявки','file'],['chat','Деканат','chat'],['notifications','Уведомления','bell'],['profile','Профиль','user']];
+const STAFF_NAV=[['home','Сводка','home'],['requests','Заявки','inbox'],['chat','Обращения','chat'],['news','Объявления','mega'],['profile','Профиль','user']];
+const TABS_ST=['home','schedule','grades','requests','chat'];const TABS_SF=['home','requests','chat','news','profile'];
+const TITLES={home:'Главная',schedule:'Расписание',grades:'Учёба',requests:'Заявки и справки',chat:'Связь с деканатом',notifications:'Уведомления',profile:'Профиль',news:'Объявления',request:'Заявка',thread:'Обращение'};
+
+function toast(t,bad){const el=document.createElement('div');el.className='toast'+(bad?' bad':'');el.textContent=t;$('#toasts').appendChild(el);setTimeout(()=>el.remove(),3600)}
+function go(view,param){const h=param?`${view}-${param}`:view;if(location.hash.slice(1)!==h)location.hash=h;else route()}
+function parseHash(){const h=decodeURIComponent(location.hash.slice(1));if(!h)return['home',null];const m=h.match(/^(request|chat)-([A-Za-z0-9]+)$/);if(m)return[m[1]==='chat'?'thread':'request',m[2]];return[h,null]}
+window.addEventListener('hashchange',route);
+
+function initials(u){return(u.first[0]+u.last[0]).toUpperCase()}
+function ava(u,s=38){return`<div class="ava" style="width:${s}px;height:${s}px;background:${esc(u.color)}">${esc(initials(u))}</div>`}
+function shell(u){
+ const nav=u.role==='staff'?STAFF_NAV:STUDENT_NAV;const tabs=u.role==='staff'?TABS_SF:TABS_ST;
+ $('#root').innerHTML=`<div class="app"><aside class="side" aria-label="Меню"><div class="brand"><div class="logo">${ic('spark',20)}</div><div>Цифровой деканат<small>${u.role==='staff'?'кабинет сотрудника':'кабинет студента'}</small></div></div>
+ <nav class="nav" id="nav">${nav.map(([v,t,i])=>`<button data-v="${v}" onclick="go('${v}')">${ic(i)}<span>${t}</span><span class="cnt" data-c="${v}" hidden></span></button>`).join('')}</nav>
+ <div class="me">${ava(u)}<div class="grow"><div class="n">${esc(u.first)} ${esc(u.last)}</div><div class="g">${esc(u.role==='staff'?'Деканат':u.group)}</div></div><button class="iconbtn" style="width:36px;height:36px" onclick="logout()" title="Выйти" aria-label="Выйти">${ic('out',18)}</button></div></aside>
+ <main class="main"><div class="top"><button class="iconbtn" id="back" hidden onclick="history.back()" aria-label="Назад">${ic('left')}</button><h1 id="title"></h1>${u.role==='student'?`<button class="iconbtn" onclick="go('notifications')" aria-label="Уведомления">${ic('bell')}<span class="dot" id="bell" hidden></span></button>`:''}<button class="iconbtn" onclick="go('profile')" aria-label="Профиль" style="padding:0;overflow:hidden;border:0">${ava(u,42)}</button></div><div id="view"></div><div class="foot">Концепт для конкурса MGIMO AI Challenge · не официальный сервис вуза · данные вымышленные</div></main></div>
+ <nav class="tabbar" aria-label="Основное меню">${tabs.map(v=>{const n=nav.find(x=>x[0]===v);return`<button data-v="${v}" onclick="go('${v}')">${ic(n[2],22)}<span>${n[1]}</span><span class="cnt" data-c="${v}" hidden></span></button>`}).join('')}</nav>`;
+ $('#root').dataset.role=u.role;$('#root').dataset.uid=u.id;
+}
+function badges(){const c=API.unread();const set=(v,n)=>document.querySelectorAll(`[data-c="${v}"]`).forEach(e=>{e.hidden=!n;e.textContent=n});set('notifications',c.n);set('chat',c.c);set('requests',c.r||0);const b=$('#bell');if(b){b.hidden=!c.n;b.textContent=c.n}}
+function skeleton(){return`<div class="grid g2"><div class="card"><div class="sk" style="height:22px;width:40%"></div><div class="sk" style="height:14px;margin-top:16px"></div><div class="sk" style="height:14px;margin-top:10px;width:80%"></div><div class="sk" style="height:14px;margin-top:10px;width:60%"></div></div><div class="card"><div class="sk" style="height:22px;width:50%"></div><div class="sk" style="height:60px;margin-top:16px"></div></div></div>`}
+function emptyBox(emoji,title,text,btn){return`<div class="empty"><div class="big">${emoji}</div><h3>${title}</h3><div>${text}</div>${btn||''}</div>`}
+
+let renderToken=0;
+async function route(){
+ const u=API.me();
+ if(!u){renderLogin();return}
+ if(!$('.app')||$('#root').dataset.uid!==u.id)shell(u);
+ const[view,param]=parseHash();state.view=view;state.param=param;
+ const V=(u.role==='staff'?STAFF_VIEWS:VIEWS);const fn=V[view];
+ document.querySelectorAll('[data-v]').forEach(b=>b.setAttribute('aria-current',(b.dataset.v===view||(view==='request'&&b.dataset.v==='requests')||(view==='thread'&&b.dataset.v==='chat'))?'page':'false'));
+ $('#title').textContent=TITLES[view]||'Цифровой деканат';$('#back').hidden=!param;
+ document.title=(TITLES[view]||'Цифровой деканат')+' · Цифровой деканат (концепт)';
+ badges();
+ const el=$('#view');const tok=++renderToken;
+ if(!fn){el.innerHTML=`<div class="card">${emptyBox('🧭','Такой страницы нет','Возможно, ссылка устарела.',`<div style="margin-top:14px"><button class="btn" onclick="go('home')">На главную</button></div>`)}</div>`;return}
+ el.innerHTML=skeleton();
+ try{const html=await fn(u,param);if(tok!==renderToken)return;el.innerHTML=html;window.scrollTo(0,0);after[view]?.(u,param);badges()}
+ catch(e){if(tok!==renderToken)return;if(e instanceof AccessError&&!API.me()){renderLogin();return}
+  el.innerHTML=`<div class="card">${emptyBox(e instanceof AccessError?'🔒':'⚠️',e instanceof AccessError?'Нет доступа':'Что-то пошло не так',esc(e.message),`<div style="margin-top:14px" class="row" style="justify-content:center"><button class="btn sec" onclick="route()">Повторить</button> <button class="btn" onclick="go('home')">На главную</button></div>`)}</div>`}
+}
+const after={};
+
+/* ---------- вход ---------- */
+function renderLogin(){
+ $('#root').dataset.uid='';
+ $('#root').innerHTML=`<div class="login"><section class="l"><div class="brand" style="padding:0;color:#fff"><div class="logo" style="background:#fff;color:var(--accent)">${ic('spark',20)}</div><div>Цифровой деканат<small style="color:rgba(255,255,255,.75)">концепт личного кабинета студента</small></div></div>
+ <div style="margin:34px 0"><h1 style="font-size:clamp(28px,4vw,44px);max-width:520px">Вся учёба в одном месте и без очереди в деканат</h1><p style="opacity:.85;max-width:460px;margin-top:12px">Расписание с переносами, оценки и «светофор» по каждой дисциплине, справки с трекингом и код выдачи вместо очереди.</p></div>
+ <div class="feats">${[['cal','Расписание, которое предупреждает','Переносы, замены и смена аудитории видны сразу'],['cap','Понятно, как дела с учёбой','Сколько баллов до допуска и что сделать'],['file','Справка за минуту','Заказ онлайн, статус как у посылки, код выдачи']].map(([i,t,d])=>`<div class="feat"><div class="ico">${ic(i)}</div><div><b>${t}</b><div style="opacity:.8;font-size:13px">${d}</div></div></div>`).join('')}</div></section>
+ <section class="r"><form id="lf" novalidate><h2 style="font-size:24px">Вход в кабинет</h2><p class="muted" style="margin:6px 0 20px">Используйте почту и пароль тестового аккаунта</p>
+ <div class="fld"><label class="f" for="em">Почта</label><input class="inp" id="em" type="email" autocomplete="username" inputmode="email" placeholder="student@test.ru" required></div>
+ <div class="fld"><label class="f" for="pw">Пароль</label><div class="pw"><input class="inp" id="pw" type="password" autocomplete="current-password" required><button type="button" id="pwt" aria-label="Показать пароль">${ic('eye')}</button></div></div>
+ <div class="err" id="lerr" role="alert" hidden></div>
+ <button class="btn block" id="lbtn" style="margin-top:6px">Войти</button>
+ <div style="margin-top:22px"><div class="small muted" style="margin-bottom:8px">Тестовые аккаунты: подставить почту</div><div class="demo"><button type="button" data-e="student@test.ru">Студент 1<br><span style="font-weight:600">Смирнов</span></button><button type="button" data-e="petrova@test.ru">Студент 2<br><span style="font-weight:600">Петрова</span></button><button type="button" data-e="dekanat@test.ru">Деканат<br><span style="font-weight:600">Иванова</span></button></div><p class="hint">Пароли указаны в комментарии к работе. В коде страницы их нет, хранятся только хеши.</p></div>
+ <div class="row" style="margin-top:18px;justify-content:space-between"><span class="tiny muted">${ic('lock',14)} Данные вымышленные</span><button type="button" class="link small" id="rst">Сбросить демо-данные</button></div></form></section></div>`;
+ $('#pwt').onclick=()=>{const p=$('#pw');p.type=p.type==='password'?'text':'password'};
+ document.querySelectorAll('.demo button').forEach(b=>b.onclick=()=>{$('#em').value=b.dataset.e;$('#pw').focus()});
+ $('#rst').onclick=async()=>{if(await confirmBox('Сбросить демо-данные?','Все заявки, сообщения и изменения в этом браузере вернутся к исходным.','Сбросить')){API.reset();toast('Демо-данные восстановлены')}};
+ $('#lf').onsubmit=async e=>{e.preventDefault();const em=$('#em').value,pw=$('#pw').value,er=$('#lerr'),b=$('#lbtn');er.hidden=true;if(!em||!pw){er.textContent='Введите почту и пароль';er.hidden=false;return}
+  b.disabled=true;b.textContent='Входим…';try{const u=await API.login(em,pw);location.hash=state.param?location.hash:'home';shell(API.me());route();toast(`Добро пожаловать, ${u.first}!`)}catch(err){er.textContent=err.message;er.hidden=false;b.disabled=false;b.textContent='Войти'}};
+}
+function logout(){API.logout();location.hash='';renderLogin()}
+
+/* ---------- модальное окно ---------- */
+function openSheet(html){const r=$('#sheet');r.innerHTML=`<div class="sheet-bd" data-close></div><div class="sheet" role="dialog" aria-modal="true">${html}</div>`;r.hidden=false;document.body.classList.add('lock');requestAnimationFrame(()=>r.classList.add('open'));r.querySelector('[data-close]').onclick=closeSheet;r.querySelectorAll('[data-x]').forEach(b=>b.onclick=closeSheet);setTimeout(()=>(r.querySelector('[autofocus]')||r.querySelector('.sheet button'))?.focus(),50)}
+function closeSheet(){const r=$('#sheet');r.classList.remove('open');document.body.classList.remove('lock');setTimeout(()=>{r.hidden=true;r.innerHTML=''},180)}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#sheet').hidden)closeSheet()});
+const sheetHead=t=>`<div class="sheet-h"><h2>${t}</h2><button class="iconbtn" data-x aria-label="Закрыть">${ic('x')}</button></div>`;
+function confirmBox(title,text,ok){return new Promise(res=>{openSheet(`${sheetHead(esc(title))}<p class="muted">${esc(text)}</p><div class="row" style="justify-content:flex-end;margin-top:18px"><button class="btn sec" id="cno">Отмена</button><button class="btn danger" id="cyes">${esc(ok)}</button></div>`);$('#cno').onclick=()=>{closeSheet();res(false)};$('#cyes').onclick=()=>{closeSheet();res(true)};$('#sheet [data-close]').onclick=()=>{closeSheet();res(false)}})}
+
+/* ---------- данные расписания ---------- */
+function lessonsFor(sched,dayTs,weekOffset){const wd=(new Date(dayTs).getDay()+6)%7+1;return sched.filter(l=>l[0]===wd).sort((a,b)=>a[1]-b[1]).map(l=>({day:l[0],pair:l[1],subj:l[2],kind:l[3],room:l[4],teacher:l[5],chg:weekOffset===0?l[6]:null}))}
+function lessonHTML(l,now){const[s,e]=PAIRS[l.pair];const c=l.chg;const isNow=now&&(()=>{const d=new Date();const m=d.getHours()*60+d.getMinutes();const toM=x=>+x.slice(0,2)*60+ +x.slice(3);return m>=toM(s)&&m<=toM(e)})();
+ const chg=c?`<div class="chg ${c.type==='cancel'?'b-bad':c.type==='extra'?'b-ok':'b-warn'}">${ic(c.type==='cancel'?'x':c.type==='extra'?'plus':'swap',14)} ${esc(c.text)}</div>`:'';
+ return`<div class="lesson ${c&&c.type==='cancel'?'cancel':''} ${isNow&&!(c&&c.type==='cancel')?'now':''}"><div class="tm">${s}<span>${e}</span></div><div><div class="s">${esc(l.subj)} ${isNow&&!(c&&c.type==='cancel')?'<span class="badge b-acc">Идёт сейчас</span>':''}</div><div class="small muted">${esc(l.kind)} · ауд. ${esc(c&&c.room?c.room:l.room)} · ${esc(l.teacher)}</div>${chg}</div></div>`}
+
+/* ---------- студент ---------- */
+const VIEWS={
+ async home(u){
+  const[sch,gr,reqs,notes,th]=await Promise.all([API.schedule(),API.grades(),API.requests(),API.notes(),API.threads()]);
+  const today=lessonsFor(sch,Date.now(),0);const h=new Date().getHours();const hi=h<5?'Доброй ночи':h<12?'Доброе утро':h<18?'Добрый день':'Добрый вечер';
+  const nowM=new Date().getHours()*60+new Date().getMinutes();const toM=x=>+x.slice(0,2)*60+ +x.slice(3);
+  const next=today.find(l=>toM(PAIRS[l.pair][1])>=nowM&&!(l.chg&&l.chg.type==='cancel'));
+  let nextTxt;if(!today.length)nextTxt='Сегодня пар нет — можно выдохнуть';else if(next){const st=toM(PAIRS[next.pair][0]);nextTxt=st<=nowM?`Сейчас: ${next.subj}, ауд. ${next.chg&&next.chg.room||next.room}`:`Следующая пара через ${st-nowM>90?Math.round((st-nowM)/60)+' ч':(st-nowM)+' мин'}: ${next.subj}, ауд. ${next.chg&&next.chg.room||next.room}`}else nextTxt='Пары на сегодня закончились';
+  const items=gr.current.items;const risk=items.filter(i=>i[2]<i[3]);const avg=pastAvg(gr);
+  const active=reqs.filter(r=>['new','work','ready'].includes(r.status));
+  const changes=sch.filter(l=>l[6]).length;
+  return`<div class="grid" style="gap:18px">
+  <div class="card hero"><div class="muted small">${fmtD(Date.now(),{weekday:'long',day:'numeric',month:'long'})}</div><h1 style="margin-top:4px">${hi}, ${esc(u.first)}!</h1><div style="margin-top:6px;font-weight:600">${esc(nextTxt)}</div>
+  <div class="quick"><button onclick="newRequest('cert')">${ic('file')}Заказать справку</button><button onclick="newRequest('st')">${ic('plus')}Подать заявление</button><button onclick="go('schedule')">${ic('cal')}Расписание</button><button onclick="newThread()">${ic('chat')}Написать в деканат</button></div></div>
+  <div class="grid g3">
+   <div class="card kpi"><div class="muted small">Средний балл за сессии</div><div class="v">${avg?avg.toFixed(2):'—'}</div><div class="small ${avg?'muted':'muted'}">${avg?'по оценкам за экзамены':'первая сессия впереди'}</div></div>
+   <div class="card kpi" style="cursor:pointer" onclick="go('grades')"><div class="muted small">Риски по допуску</div><div class="v" style="color:${risk.length?'var(--warn)':'var(--ok)'}">${risk.length}</div><div class="small muted">${risk.length?risk.map(r=>esc(r[0])).join(', '):'все дисциплины в норме'}</div></div>
+   <div class="card kpi" style="cursor:pointer" onclick="go('requests')"><div class="muted small">Заявки в работе</div><div class="v">${active.length}</div><div class="small muted">${active.filter(r=>r.status==='ready').length?`<span style="color:var(--ok);font-weight:700">${active.filter(r=>r.status==='ready').length} готово к выдаче</span>`:'ничего не ждёт вас'}</div></div>
+  </div>
+  <div class="grid g2">
+   <div class="card"><div class="card-h"><h2>Сегодня</h2>${changes?`<span class="badge b-warn">${changes} ${plural(changes,'изменение','изменения','изменений')} на неделе</span>`:''}<button class="link" onclick="go('schedule')">Неделя</button></div>${today.length?today.map(l=>lessonHTML(l,true)).join(''):emptyBox('🌿','Пар нет','Отдыхайте или загляните в расписание на неделю')}</div>
+   <div class="card"><div class="card-h"><h2>Важное</h2><button class="link" onclick="go('notifications')">Все</button></div>${notes.length?`<div class="list">${notes.slice(0,4).map(noteItem).join('')}</div>`:emptyBox('🔕','Пока тихо','Новые объявления и напоминания появятся здесь')}</div>
+  </div>
+  <div class="grid g2">
+   <div class="card"><div class="card-h"><h2>Мои заявки</h2><button class="link" onclick="go('requests')">Все</button></div>${active.length?`<div class="list">${active.slice(0,3).map(reqItem).join('')}</div>`:emptyBox('📄','Активных заявок нет','Справку можно заказать за минуту',`<div style="margin-top:12px"><button class="btn" onclick="newRequest('cert')">${ic('plus',18)} Заказать справку</button></div>`)}</div>
+   <div class="card"><div class="card-h"><h2>Деканат на связи</h2><button class="link" onclick="go('chat')">Открыть</button></div>${th.length?`<div class="list">${th.slice(0,3).map(threadItem).join('')}</div>`:emptyBox('💬','Обращений нет','Задайте вопрос, ответ придёт сюда и в уведомления')}</div>
+  </div></div>`},
+
+ async schedule(u){
+  const sch=await API.schedule();state.week=state.week||0;const w=state.week;const mon=mondayOf(Date.now())+w*7*DAY;
+  const days=[0,1,2,3,4,5].map(i=>mon+i*DAY);const today=startOfDay(Date.now());
+  state.day=state.day&&days.includes(state.day)?state.day:(days.includes(today)?today:days[0]);
+  const changes=w===0?sch.filter(l=>l[6]):[];
+  return`<div class="card" style="margin-bottom:16px"><div class="row wrap between"><div class="row"><button class="iconbtn" onclick="state.week--;state.day=null;route()" aria-label="Предыдущая неделя">${ic('left')}</button><div style="text-align:center;min-width:170px"><b>${fmtD(days[0])} — ${fmtD(days[5])}</b><div class="small muted">${w===0?'текущая неделя':w===1?'следующая неделя':w===-1?'прошлая неделя':''}</div></div><button class="iconbtn" onclick="state.week++;state.day=null;route()" aria-label="Следующая неделя">${ic('right')}</button></div>
+  <div class="small muted">Группа ${esc(u.group)} · ${esc(u.profile)}</div></div>
+  ${changes.length?`<div class="faq" style="margin-top:14px;background:var(--warn-bg);border-color:transparent"><b style="color:var(--warn)">${ic('alert',16)} Изменения на этой неделе: ${changes.length}</b><div class="small" style="margin-top:4px">${changes.map(c=>`${['','Пн','Вт','Ср','Чт','Пт','Сб'][c[0]]}, ${c[1]} пара — ${esc(c[2])}: ${esc(c[6].text.toLowerCase())}`).join('<br>')}</div></div>`:''}</div>
+  <div class="chips" role="group" aria-label="День недели" style="margin-bottom:12px" id="daychips">${days.map(d=>{const n=lessonsFor(sch,d,w).length;return`<button class="chip" aria-pressed="${d===state.day}" onclick="state.day=${d};route()">${fmtD(d,{weekday:'short'})} ${new Date(d).getDate()}${d===today?' · сегодня':''}<span class="muted"> · ${n}</span></button>`}).join('')}</div>
+  <div class="grid g3" id="weekgrid">${days.map(d=>{const ls=lessonsFor(sch,d,w);return`<div class="card daycol ${d===today?'today':''}" data-day="${d}"><h3>${fmtD(d,{weekday:'long'})}<span class="small muted">${fmtD(d)}</span></h3>${ls.length?ls.map(l=>lessonHTML(l,d===today)).join(''):`<div class="empty" style="padding:16px 0">🌿 Пар нет</div>`}</div>`}).join('')}</div>`},
+
+ async grades(u){
+  const g=await API.grades();state.gtab=state.gtab||'now';const items=g.current.items;const risk=items.filter(i=>i[2]<i[3]);const avg=pastAvg(g);
+  const tab=state.gtab;
+  const summary=risk.length?`<b>Почти всё хорошо.</b> ${items.length-risk.length} из ${items.length} дисциплин идут к допуску. Обратите внимание: ${risk.map(r=>`${esc(r[0])} — не хватает ${r[3]-r[2]} ${plural(r[3]-r[2],'балла','баллов','баллов')}`).join('; ')}.`:'<b>Всё отлично.</b> По всем дисциплинам вы набрали баллы для допуска.';
+  return`<div class="card" style="margin-bottom:16px;background:${risk.length?'var(--warn-bg)':'var(--ok-bg)'};border-color:transparent"><div class="row" style="align-items:flex-start"><div class="ico ${risk.length?'warn':'ok'}">${ic(risk.length?'alert':'check')}</div><div><h3>Как у меня дела с учёбой</h3><div class="small" style="margin-top:4px">${summary}</div></div></div></div>
+  <div class="seg" role="group" aria-label="Раздел" style="margin-bottom:16px;max-width:520px">${[['now','Текущий семестр'],['session','Сессия'],['past','Зачётка']].map(([k,t])=>`<button aria-pressed="${tab===k}" onclick="state.gtab='${k}';route()">${t}</button>`).join('')}</div>
+  ${tab==='now'?`<div class="card"><div class="card-h"><h2>${esc(g.current.name)}</h2><span class="small muted">баллы текущего контроля из 100</span></div><div class="list">${items.map(([s,t,p,min],i)=>{const ok=p>=min;return`<div style="padding:12px 0;border-top:${i?'1px solid var(--line)':'0'}"><div class="row between"><div class="grow"><b>${esc(s)}</b><div class="small muted">${t} · допуск с ${min} баллов</div></div><div style="text-align:right"><b style="font-size:18px">${p}</b><div class="tiny ${ok?'':'muted'}" style="color:${ok?'var(--ok)':'var(--warn)'};font-weight:700">${ok?(p>=85?'идёт на «отлично»':'допуск есть'):`ещё ${min-p} ${plural(min-p,'балл','балла','баллов')}`}</div></div></div><div class="bar" style="margin-top:8px"><i style="width:${p}%;background:${ok?(p>=85?'var(--ok)':'var(--accent)'):'var(--warn)'}"></i><span class="mark" style="left:${min}%"></span></div></div>`}).join('')}</div></div>`:''}
+  ${tab==='session'?`<div class="card"><div class="card-h"><h2>Зимняя сессия</h2><span class="badge b-info">зачёты с 21 декабря</span></div>${g.session.length?`<div class="list">${g.session.map(([s,t,d])=>{const it=items.find(i=>i[0]===s);const ok=!it||it[2]>=it[3];return`<div class="item" style="cursor:default"><div class="ico ${t==='Экзамен'?'':'info'}">${ic(t==='Экзамен'?'cap':'check')}</div><div class="grow"><div class="t">${esc(s)}</div><div class="small muted">${t}</div></div><div style="text-align:right"><b>${d}</b><div class="tiny" style="font-weight:700;color:${ok?'var(--ok)':'var(--warn)'}">${ok?'допуск есть':'нет допуска'}</div></div></div>`}).join('')}</div>`:emptyBox('🗓','Расписание сессии ещё не опубликовано','Мы пришлём уведомление, как только появятся даты')}</div>`:''}
+  ${tab==='past'?(g.past.length?`<div class="grid g2">${g.past.map(s=>`<div class="card"><div class="card-h"><h2>${esc(s.name)}</h2></div><table class="t"><thead><tr><th>Дисциплина</th><th>Форма</th><th style="text-align:right">Оценка</th></tr></thead><tbody>${s.items.map(([n,f,m])=>`<tr><td>${esc(n)}</td><td class="muted small">${f}</td><td style="text-align:right">${gradeChip(m)}</td></tr>`).join('')}</tbody></table></div>`).join('')}</div><p class="small muted" style="margin-top:12px">Средний балл по экзаменам: <b>${avg.toFixed(2)}</b></p>`:`<div class="card">${emptyBox('🎓','Зачётка пока пустая','Вы на первом курсе: оценки за первую сессию появятся здесь в январе')}</div>`):''}`},
+
+ async requests(u){
+  const reqs=await API.requests();state.rf=state.rf||'active';const f=state.rf;
+  const list=reqs.filter(r=>f==='all'||(f==='active'?['new','work','ready'].includes(r.status):['done','rejected','cancelled'].includes(r.status)));
+  return`<div class="grid g2" style="margin-bottom:16px"><button class="card row" style="cursor:pointer;text-align:left" onclick="newRequest('cert')"><div class="ico">${ic('file')}</div><div class="grow"><h3>Заказать справку</h3><div class="small muted">Об обучении, для военкомата, выписка оценок…</div></div>${ic('right')}</button><button class="card row" style="cursor:pointer;text-align:left" onclick="newRequest('st')"><div class="ico info">${ic('plus')}</div><div class="grow"><h3>Подать заявление</h3><div class="small muted">Пересдача, индивидуальный график, матпомощь…</div></div>${ic('right')}</button></div>
+  <div class="card"><div class="card-h"><h2>Мои заявки</h2></div><div class="chips" style="margin-bottom:8px">${[['active','Активные'],['closed','Завершённые'],['all','Все']].map(([k,t])=>`<button class="chip" aria-pressed="${f===k}" onclick="state.rf='${k}';route()">${t}</button>`).join('')}</div>
+  ${list.length?`<div class="list">${list.map(reqItem).join('')}</div>`:emptyBox(f==='active'?'✨':'🗂',f==='active'?'Активных заявок нет':'Здесь пока пусто',f==='active'?'Закажите справку: она будет готова через 2–5 рабочих дней':'Завершённые заявки появятся здесь')}</div>`},
+
+ async request(u,id){const r=await API.request(id);return requestDetail(r,false)},
+
+ async chat(u){const th=await API.threads();return`<div class="grid g2" style="align-items:start"><div class="card"><div class="card-h"><h2>Мои обращения</h2><button class="btn" onclick="newThread()">${ic('plus',18)} Новое</button></div>${th.length?`<div class="list">${th.map(threadItem).join('')}</div>`:emptyBox('💬','Обращений пока нет','Напишите в деканат: ответ придёт сюда и в уведомления')}</div>
+  <div class="card"><div class="card-h"><h2>Частые вопросы</h2></div><div class="stack">${FAQ.slice(0,4).map(f=>`<details class="faq"><summary style="font-weight:700;cursor:pointer">${esc(f.q)}</summary><div class="small" style="margin-top:8px">${esc(f.a)}</div></details>`).join('')}</div><div class="small muted" style="margin-top:12px">Деканат: каб. 214, пн–пт 10:00–17:00. Ответ на обращение обычно приходит в течение рабочего дня.</div></div></div>`},
+
+ async thread(u,id){const t=await API.thread(id);return threadView(t,u)},
+
+ async notifications(u){const notes=await API.notes();const news=await API.news();state.nf=state.nf||'all';const f=state.nf;const list=notes.filter(n=>f==='all'||n.kind===f||(f==='news'&&n.kind==='news'));
+  return`<div class="grid g2" style="align-items:start"><div class="card"><div class="card-h"><h2>Уведомления</h2>${notes.some(n=>!n.read)?`<button class="link" onclick="readAll()">Прочитать все</button>`:''}</div><div class="chips" style="margin-bottom:8px">${[['all','Все'],['deadline','Дедлайны'],['change','Изменения'],['request','Заявки'],['chat','Ответы']].map(([k,t])=>`<button class="chip" aria-pressed="${f===k}" onclick="state.nf='${k}';route()">${t}</button>`).join('')}</div>${list.length?`<div class="list">${list.map(noteItem).join('')}</div>`:emptyBox('🔕','Здесь пусто','Уведомления этого типа появятся здесь')}</div>
+  <div class="card"><div class="card-h"><h2>Объявления деканата</h2></div><div class="list">${news.map(n=>`<div style="padding:12px 0;border-top:1px solid var(--line)"><div class="row"><span class="badge ${n.tag==='deadline'?'b-warn':'b-acc'}">${n.tag==='deadline'?'Дедлайн':'Новость'}</span><span class="tiny muted">${fmtDT(n.at)}</span></div><h3 style="margin-top:6px">${esc(n.title)}</h3><div class="small muted" style="margin-top:4px">${esc(n.text)}</div></div>`).join('')}</div></div></div>`},
+
+ async profile(u){const p=await API.profile();return profileView(p)}
+};
+after.thread=()=>{const m=$('#msgs');if(m)m.scrollTop=m.scrollHeight;$('#msgin')?.focus()};
+
+function pastAvg(g){const ns=g.past.flatMap(s=>s.items.map(i=>+i[2])).filter(x=>x>0);return ns.length?ns.reduce((a,b)=>a+b,0)/ns.length:0}
+function gradeChip(m){const c=m==='5'?'b-ok':m==='4'?'b-acc':m==='3'?'b-warn':m==='зачёт'?'b-ok':'b-bad';return`<span class="grade badge ${c}" style="padding:0 10px">${esc(m)}</span>`}
+function statusBadge(r){const[t,c]=ST[r.kind][r.status];return`<span class="badge b-${c}">${t}</span>`}
+function reqItem(r){const t=typeOf(r.type);return`<button class="item" onclick="go('request','${r.id}')"><div class="ico ${r.status==='ready'?'ok':r.kind==='st'?'info':''}">${ic(r.kind==='cert'?'file':'plus')}</div><div class="grow"><div class="t">${esc(t.t)}</div><div class="small muted">№${r.id} · ${fmtDT(r.createdAt)}${r.student?' · '+esc(r.student.last+' '+r.student.first+', '+r.student.group):''}</div></div>${statusBadge(r)}</button>`}
+function threadItem(t){const un=t.student?t.unreadStaff:t.unreadStudent;const last=t.messages[t.messages.length-1];return`<button class="item" onclick="go('chat','${t.id}')"><div class="ico ${un?'':'info'}">${ic('chat')}</div><div class="grow"><div class="t">${esc(t.topic)}</div><div class="small muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.student?esc(t.student.last+' '+t.student.first)+' · ':''}${last.from==='staff'?'Деканат: ':''}${esc(last.text)}</div></div>${un?`<span class="badge b-bad">${un}</span>`:t.status==='closed'?'<span class="badge b-muted">Закрыто</span>':`<span class="tiny muted">${fmtDT(t.updatedAt).replace('сегодня, ','')}</span>`}</button>`}
+const NOTE_IC={request:['file','ok'],chat:['chat','info'],change:['swap','warn'],deadline:['clock','bad'],news:['mega','']};
+function noteItem(n){const[i,c]=NOTE_IC[n.kind]||['bell',''];return`<button class="item" onclick="openNote('${n.id}','${n.link}')"><div class="ico ${c}">${ic(i)}</div><div class="grow"><div class="t" style="${n.read?'font-weight:600':''}">${esc(n.title)}</div><div class="small muted">${esc(n.text)}</div><div class="tiny muted" style="margin-top:2px">${fmtDT(n.at)}</div></div>${n.read?'':'<span class="badge b-acc" aria-label="Новое">•</span>'}</button>`}
+async function openNote(id,link){await API.readNote(id);const m=link.match(/^(request|chat)-(.+)$/);m?go(m[1],m[2]):go(link)}
+async function readAll(){await API.readAll();toast('Все уведомления прочитаны');route()}
+
+function requestDetail(r,staff){const t=typeOf(r.type);const steps=STEPS[r.kind];const idx=stepIdx[r.status];const closed=['rejected','cancelled'].includes(r.status);
+ const eta=r.createdAt+t.days*DAY;const f=r.fields;const u=staff?r.student:API.me();
+ const fieldsHTML=r.kind==='cert'?`<div class="grid g3" style="gap:10px"><div><div class="tiny muted">Экземпляров</div><b>${esc(f.copies)}</b></div><div><div class="tiny muted">Куда</div><b>${esc(f.purpose)}</b></div><div><div class="tiny muted">Формат</div><b>${esc(f.format)}</b></div></div>`:`<div class="doc">${esc(statementText(t,u,f))}</div>`;
+ return`<div class="grid g2" style="align-items:start"><div class="card"><div class="row between wrap"><span class="small muted">Заявка №${esc(r.id)} · ${fmtDT(r.createdAt)}</span>${statusBadge(r)}</div><h2 style="margin-top:8px;font-size:22px">${esc(t.t)}</h2>
+ ${staff?`<div class="row" style="margin-top:12px">${ava(r.student,34)}<div><b>${esc(r.student.last+' '+r.student.first+' '+r.student.middle)}</b><div class="small muted">${esc(r.student.group)} · ${esc(r.student.faculty)}</div></div></div>`:''}
+ ${closed?'':`<div class="steps">${steps.map((s,i)=>`<div class="${i<=idx?'on':''}"></div>`).join('')}</div><div class="steps-l">${steps.map(s=>`<span>${s}</span>`).join('')}</div>`}
+ ${r.status==='ready'&&r.code&&!staff?`<div style="margin-top:18px"><div class="small muted" style="margin-bottom:6px">Код выдачи: покажите в каб. 214, очередь не нужна</div><div class="code" aria-label="Код выдачи ${esc(r.code)}">${esc(r.code)}</div></div>`:''}
+ ${['new','work'].includes(r.status)?`<div class="faq" style="margin-top:16px">${ic('clock',16)} Ориентировочно готово: <b>${fmtD(eta,{weekday:'long',day:'numeric',month:'long'})}</b></div>`:''}
+ <div style="margin-top:18px">${fieldsHTML}</div>
+ ${!staff&&r.status==='new'?`<button class="btn danger" style="margin-top:16px" onclick="cancelReq('${r.id}')">Отозвать заявку</button>`:''}
+ ${staff?staffActions(r):''}</div>
+ <div class="card"><div class="card-h"><h2>История</h2></div><div class="tl">${r.history.slice().reverse().map(h=>`<div><b>${ST[r.kind][h.status][0]}</b><div class="tiny muted">${fmtDT(h.at)} · ${esc(h.by)}</div>${h.comment?`<div class="small" style="margin-top:4px;background:var(--soft);padding:8px 10px;border-radius:10px">${esc(h.comment)}</div>`:''}</div>`).join('')}</div></div></div>`}
+function statementText(t,u,f){return`Декану факультета\nот студента ${u.course} курса, группы ${u.group}\n${u.last} ${u.first} ${u.middle}\nзачётная книжка № ${u.record}\n\nЗАЯВЛЕНИЕ\n\n${t.text(u,f)}\n\nДата: ${fmtD(Date.now(),{day:'2-digit',month:'2-digit',year:'numeric'})}\nПодписано простой электронной подписью в личном кабинете`}
+async function cancelReq(id){if(!await confirmBox('Отозвать заявку?','Её нельзя будет вернуть, но можно подать новую.','Отозвать'))return;try{await API.cancelRequest(id);toast('Заявка отозвана');route()}catch(e){toast(e.message,true)}}
+
+/* мастер новой заявки */
+function newRequest(kind){const u=API.me();const types=kind==='cert'?CERTS:STATEMENTS;let sel=null;const fields={copies:1,purpose:'По месту требования',format:'Бумажная'};
+ const draw=()=>{const t=sel&&typeOf(sel);
+  openSheet(`${sheetHead(kind==='cert'?'Заказать справку':'Подать заявление')}
+  ${!t?`<p class="muted small" style="margin-top:-6px">Выберите, что нужно. Данные из профиля подставим сами.</p><div class="list">${types.map(x=>`<button class="item" data-t="${x.id}"><div class="ico ${kind==='st'?'info':''}">${ic(kind==='cert'?'file':'plus')}</div><div class="grow"><div class="t">${x.t}</div><div class="small muted">${x.d}</div></div><span class="tiny muted">${x.days} ${plural(x.days,'день','дня','дней')}</span></button>`).join('')}</div>`:
+  `<button class="link small" id="bk">${ic('left',14)} Другой тип</button><h3 style="margin:8px 0 14px;font-size:18px">${t.t}</h3><form id="rf" novalidate>
+  ${kind==='cert'?`<div class="fld"><span class="f" style="font-weight:700;font-size:13px">Количество экземпляров</span><div class="row" style="margin-top:6px"><button type="button" class="iconbtn" id="mn" aria-label="Меньше">−</button><b id="cp" style="min-width:24px;text-align:center;font-size:18px">${fields.copies}</b><button type="button" class="iconbtn" id="pl" aria-label="Больше">+</button></div></div>
+   <div class="fld"><label class="f" for="pu">Куда нужна</label><select class="inp" id="pu">${['По месту требования','В банк','Работодателю','В МФЦ / соцзащиту','В военкомат','В посольство'].map(o=>`<option ${o===fields.purpose?'selected':''}>${o}</option>`).join('')}</select></div>
+   <div class="fld"><span class="f" style="font-weight:700;font-size:13px">Формат</span><div class="seg" style="margin-top:6px" id="fmt">${['Бумажная','Электронная'].map(o=>`<button type="button" aria-pressed="${fields.format===o}" data-f="${o}">${o==='Бумажная'?'Бумажная, в каб. 214':'Электронная, PDF с подписью'}</button>`).join('')}</div></div>`:
+   t.fields.map(fl=>`<div class="fld"><label class="f" for="f_${fl.k}">${fl.l}${fl.req?' *':''}</label>${fl.type==='select'?`<select class="inp" id="f_${fl.k}" data-k="${fl.k}">${fl.opts.map(o=>`<option ${fields[fl.k]===o?'selected':''}>${o}</option>`).join('')}</select>`:fl.type==='subject'?`<select class="inp" id="f_${fl.k}" data-k="${fl.k}"><option value="">Выберите дисциплину</option>${(DB.grades[u.id]?.current.items||[]).map(i=>`<option ${fields[fl.k]===i[0]?'selected':''}>${esc(i[0])}</option>`).join('')}</select>`:`<textarea class="inp" id="f_${fl.k}" data-k="${fl.k}" maxlength="600">${esc(fields[fl.k]||'')}</textarea>`}</div>`).join('')+`<div class="small muted" style="margin-bottom:6px">${ic('spark',14)} Заявление собрано из данных профиля, писать от руки не нужно:</div><div class="doc" id="prev"></div>`}
+  <div class="err" id="rerr" hidden role="alert"></div><button class="btn block" id="rsub" style="margin-top:16px">Отправить в деканат</button><p class="hint" style="text-align:center">Срок подготовки: ${t.days} ${plural(t.days,'рабочий день','рабочих дня','рабочих дней')}. Статус придёт в уведомления.</p></form>`}`);
+  document.querySelectorAll('#sheet [data-t]').forEach(b=>b.onclick=()=>{sel=b.dataset.t;if(kind==='st')typeOf(sel).fields.forEach(fl=>{if(fl.type==='select')fields[fl.k]=fields[fl.k]||fl.opts[0]});draw()});
+  if(!t)return;
+  $('#bk').onclick=()=>{sel=null;draw()};
+  if(kind==='cert'){$('#mn').onclick=()=>{fields.copies=Math.max(1,fields.copies-1);$('#cp').textContent=fields.copies};$('#pl').onclick=()=>{fields.copies=Math.min(5,fields.copies+1);$('#cp').textContent=fields.copies};$('#pu').onchange=e=>fields.purpose=e.target.value;document.querySelectorAll('#fmt button').forEach(b=>b.onclick=()=>{fields.format=b.dataset.f;document.querySelectorAll('#fmt button').forEach(x=>x.setAttribute('aria-pressed',x===b))})}
+  else{const upd=()=>{$('#prev').textContent=statementText(t,u,fields)};document.querySelectorAll('#rf [data-k]').forEach(el=>el.oninput=el.onchange=()=>{fields[el.dataset.k]=el.value;upd()});upd()}
+  $('#rf').onsubmit=async e=>{e.preventDefault();const b=$('#rsub'),er=$('#rerr');er.hidden=true;b.disabled=true;b.textContent='Отправляем…';try{const r=await API.createRequest(kind,sel,fields);closeSheet();toast(`Заявка №${r.id} отправлена. Следите за статусом здесь.`);go('request',r.id)}catch(err){er.textContent=err.message;er.hidden=false;b.disabled=false;b.textContent='Отправить в деканат'}};
+ };draw()}
+
+/* чат */
+function threadView(t,u){const staff=u.role==='staff';return`<div class="card" style="max-width:820px"><div class="row between wrap" style="margin-bottom:10px"><div><h2>${esc(t.topic)}</h2><div class="small muted">${staff?esc(t.student.last+' '+t.student.first+', '+t.student.group):'Деканат · Иванова Ольга Викторовна, каб. 214'}</div></div>${t.status==='closed'?'<span class="badge b-muted">Закрыто</span>':staff?`<button class="btn sec" onclick="closeThr('${t.id}')">${ic('check',16)} Вопрос решён</button>`:'<span class="badge b-ok">Открыто</span>'}</div>
+ <div class="msgs" id="msgs">${t.messages.map(m=>{const mine=(m.from==='staff')===staff;return`<div class="msg ${mine?'mine':'their'}">${esc(m.text)}<div class="m">${mine?'Вы':m.from==='staff'?'Деканат':'Студент'} · ${fmtDT(m.at)}</div></div>`}).join('')}</div>
+ <form id="mf" class="row" style="margin-top:12px;align-items:flex-end"><label class="sr" for="msgin">Сообщение</label><textarea class="inp grow" id="msgin" rows="1" style="min-height:46px" placeholder="${t.status==='closed'?'Напишите, чтобы открыть обращение снова':'Сообщение…'}" maxlength="2000"></textarea><button class="btn" aria-label="Отправить" style="width:48px;padding:0">${ic('send')}</button></form></div>`}
+after.thread=()=>{const m=$('#msgs');if(m)m.scrollTop=m.scrollHeight;const f=$('#mf');if(!f)return;const inp=$('#msgin');inp.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();f.requestSubmit()}};f.onsubmit=async e=>{e.preventDefault();const v=inp.value;if(!v.trim())return;inp.disabled=true;try{await API.send(state.param,v);await route()}catch(err){toast(err.message,true);inp.disabled=false}}};
+async function closeThr(id){await API.closeThread(id);toast('Обращение закрыто');route()}
+function newThread(){openSheet(`${sheetHead('Написать в деканат')}<form id="tf" novalidate><div class="fld"><label class="f" for="tt">Тема</label><input class="inp" id="tt" maxlength="120" placeholder="Например: перенос экзамена" autofocus></div><div class="fld"><label class="f" for="tx">Сообщение</label><textarea class="inp" id="tx" maxlength="2000" placeholder="Опишите вопрос"></textarea></div><div id="faqs" aria-live="polite"></div><div class="err" id="terr" hidden role="alert"></div><button class="btn block" id="tsub">Отправить</button><p class="hint" style="text-align:center">Ответ придёт сюда и в уведомления, обычно в течение рабочего дня</p></form>`);
+ const sug=()=>{const q=($('#tt').value+' '+$('#tx').value).toLowerCase();const hits=q.trim().length<4?[]:FAQ.filter(f=>f.k.some(k=>q.includes(k))).slice(0,2);$('#faqs').innerHTML=hits.length?`<div class="faq" style="margin-bottom:14px;background:var(--accent-soft);border-color:transparent"><b style="color:var(--accent)">${ic('spark',16)} Возможно, ответ уже есть</b>${hits.map(h=>`<div style="margin-top:8px"><b class="small">${esc(h.q)}</b><div class="small">${esc(h.a)}</div></div>`).join('')}<button type="button" class="btn sec" style="margin-top:10px;min-height:36px;padding:6px 12px" data-x>Это помогло, не отправлять</button></div>`:'';$('#faqs [data-x]')?.addEventListener('click',()=>{closeSheet();toast('Отлично! Если что, мы на связи')})};
+ $('#tt').oninput=sug;$('#tx').oninput=sug;
+ $('#tf').onsubmit=async e=>{e.preventDefault();const b=$('#tsub'),er=$('#terr');er.hidden=true;b.disabled=true;try{const t=await API.newThread($('#tt').value,$('#tx').value);closeSheet();toast('Обращение отправлено');go('chat',t.id)}catch(err){er.textContent=err.message;er.hidden=false;b.disabled=false}}}
+
+/* профиль */
+function profileView(p){const staff=p.role==='staff';return`<div class="grid g2" style="align-items:start"><div class="card"><div class="row" style="gap:16px">${ava(p,64)}<div><h2 style="font-size:22px">${esc(p.last)} ${esc(p.first)} ${esc(p.middle)}</h2><div class="muted">${staff?esc(p.position):`Студент ${p.course} курса · ${esc(p.group)}`}</div></div></div>
+ ${staff?'':`<div class="grid g2" style="gap:14px;margin-top:18px">${[['Факультет',p.faculty],['Направление',p.program],['Профиль',p.profile],['Курс',p.course+' курс'],['Группа',p.group],['Зачётная книжка','№ '+p.record]].map(([k,v])=>`<div><div class="tiny muted">${k}</div><b>${esc(v)}</b></div>`).join('')}</div>`}
+ <div style="margin-top:18px"><div class="tiny muted">Почта для входа</div><b>${esc(p.email)}</b></div>
+ ${staff?'':`<form id="phf" class="row" style="margin-top:16px;align-items:flex-end" novalidate><div class="grow"><label class="f" for="ph">Телефон</label><input class="inp" id="ph" value="${esc(p.phone)}" inputmode="tel" autocomplete="tel"></div><button class="btn sec">Сохранить</button></form>`}
+ <button class="btn sec block" style="margin-top:18px" onclick="logout()">${ic('out',18)} Выйти</button></div>
+ <div class="card"><div class="card-h"><h2>${ic('lock',18)} Безопасность</h2></div><form id="pwf" novalidate><div class="fld"><label class="f" for="p1">Текущий пароль</label><input class="inp" type="password" id="p1" autocomplete="current-password"></div><div class="fld"><label class="f" for="p2">Новый пароль</label><input class="inp" type="password" id="p2" autocomplete="new-password"><div class="hint">От 8 символов, буквы и цифры</div></div><div class="err" id="perr" hidden role="alert"></div><button class="btn">Сменить пароль</button></form>
+ <div class="faq small" style="margin-top:16px">Пароль хранится только в виде хеша (PBKDF2-SHA256, 100 000 итераций, своя «соль» у каждого пользователя). Сессия длится 8 часов. После 5 неверных попыток вход блокируется на минуту. Вы видите только свои данные: чужую заявку не открыть даже по прямой ссылке.</div></div></div>`}
+after.profile=()=>{const ph=$('#phf');if(ph)ph.onsubmit=async e=>{e.preventDefault();try{await API.updatePhone($('#ph').value);toast('Телефон сохранён')}catch(err){toast(err.message,true)}};
+ $('#pwf').onsubmit=async e=>{e.preventDefault();const er=$('#perr');er.hidden=true;try{await API.changePassword($('#p1').value,$('#p2').value);$('#p1').value=$('#p2').value='';toast('Пароль изменён')}catch(err){er.textContent=err.message;er.hidden=false}}};
+
+/* ---------- сотрудник деканата ---------- */
+function staffActions(r){const opts={new:[['work','Взять в работу','btn'],['rejected','Отклонить','btn danger']],work:[['ready',r.kind==='cert'?'Готова к выдаче':'Одобрить','btn ok'],['rejected','Отклонить','btn danger']],ready:[['done',r.kind==='cert'?'Отметить выданной':'Исполнено','btn']]}[r.status]||[];
+ if(!opts.length)return'';return`<div style="margin-top:18px;border-top:1px solid var(--line);padding-top:16px"><label class="f" for="scm">Комментарий для студента</label><textarea class="inp" id="scm" placeholder="Например: заберите в каб. 214 с 10:00 до 17:00" maxlength="500"></textarea><div class="row wrap" style="margin-top:10px">${opts.map(([s,t,c])=>`<button class="${c}" onclick="setSt('${r.id}','${s}')">${t}</button>`).join('')}</div></div>`}
+async function setSt(id,s){try{await API.setStatus(id,s,$('#scm')?.value||'');toast('Статус обновлён, студент получил уведомление');route()}catch(e){toast(e.message,true)}}
+const STAFF_VIEWS={
+ async home(u){const[reqs,th,news]=await Promise.all([API.requests(),API.threads(),API.news()]);const c=s=>reqs.filter(r=>r.status===s).length;const wait=th.filter(t=>t.unreadStaff>0);
+  return`<div class="card hero" style="margin-bottom:16px"><div class="muted small">${fmtD(Date.now(),{weekday:'long',day:'numeric',month:'long'})}</div><h1 style="margin-top:4px">Здравствуйте, ${esc(u.first)} ${esc(u.middle)}!</h1><div style="margin-top:6px;font-weight:600">${c('new')?`${c('new')} ${plural(c('new'),'новая заявка ждёт','новые заявки ждут','новых заявок ждут')} обработки`:'Новых заявок нет'}${wait.length?` · ${wait.length} ${plural(wait.length,'вопрос','вопроса','вопросов')} без ответа`:''}</div></div>
+  <div class="grid g4" style="margin-bottom:16px">${[['Новые',c('new'),'info'],['В работе',c('work'),'warn'],['Готовы к выдаче',c('ready'),'ok'],['Вопросы без ответа',wait.length,'bad']].map(([t,v,k])=>`<div class="card kpi"><div class="muted small">${t}</div><div class="v" style="color:var(--${k})">${v}</div></div>`).join('')}</div>
+  <div class="grid g2"><div class="card"><div class="card-h"><h2>Требуют внимания</h2><button class="link" onclick="go('requests')">Все заявки</button></div>${reqs.filter(r=>['new','work'].includes(r.status)).length?`<div class="list">${reqs.filter(r=>['new','work'].includes(r.status)).slice(0,5).map(reqItem).join('')}</div>`:emptyBox('🎉','Все заявки обработаны','Можно выпить чаю')}</div>
+  <div class="card"><div class="card-h"><h2>Обращения</h2><button class="link" onclick="go('chat')">Все</button></div>${th.length?`<div class="list">${th.slice(0,5).map(threadItem).join('')}</div>`:emptyBox('💬','Обращений нет','')}</div></div>`},
+ async requests(u){const reqs=await API.requests();state.sf=state.sf||'new';state.sq=state.sq||'';const f=state.sf,q=state.sq.toLowerCase();
+  const list=reqs.filter(r=>(f==='all'||r.status===f||(f==='closed'&&['done','rejected','cancelled'].includes(r.status)))&&(!q||(r.id+' '+r.student.last+' '+r.student.first+' '+r.student.group+' '+typeOf(r.type).t).toLowerCase().includes(q)));
+  return`<div class="card"><div class="row wrap" style="margin-bottom:10px"><div class="chips grow">${[['new','Новые'],['work','В работе'],['ready','Готовы'],['closed','Закрытые'],['all','Все']].map(([k,t])=>`<button class="chip" aria-pressed="${f===k}" onclick="state.sf='${k}';route()">${t} <span class="muted">${k==='all'?reqs.length:k==='closed'?reqs.filter(r=>['done','rejected','cancelled'].includes(r.status)).length:reqs.filter(r=>r.status===k).length}</span></button>`).join('')}</div><input class="inp" id="sq" style="max-width:260px;min-height:40px" placeholder="Поиск: ФИО, группа, №" value="${esc(state.sq)}" aria-label="Поиск по заявкам"></div>
+  ${list.length?`<div class="list">${list.map(reqItem).join('')}</div>`:emptyBox('📭','Заявок нет','В этом статусе пусто')}</div>`},
+ async request(u,id){const r=await API.request(id);return requestDetail(r,true)},
+ async chat(u){const th=await API.threads();th.sort((a,b)=>(b.unreadStaff>0)-(a.unreadStaff>0)||b.updatedAt-a.updatedAt);return`<div class="card" style="max-width:820px"><div class="card-h"><h2>Обращения студентов</h2><span class="small muted">сначала без ответа</span></div>${th.length?`<div class="list">${th.map(threadItem).join('')}</div>`:emptyBox('💬','Обращений нет','')}</div>`},
+ async thread(u,id){const t=await API.thread(id);return threadView(t,u)},
+ async news(u){const news=await API.news();return`<div class="grid g2" style="align-items:start"><div class="card"><div class="card-h"><h2>Новое объявление</h2></div><form id="nf" novalidate><div class="fld"><label class="f" for="nt">Заголовок</label><input class="inp" id="nt" maxlength="120"></div><div class="fld"><label class="f" for="nx">Текст</label><textarea class="inp" id="nx" maxlength="1000"></textarea></div><div class="fld"><span class="f" style="font-weight:700;font-size:13px">Тип</span><div class="seg" id="ntag" style="margin-top:6px"><button type="button" aria-pressed="true" data-t="news">Новость</button><button type="button" aria-pressed="false" data-t="deadline">Дедлайн</button></div></div><div class="err" id="nerr" hidden role="alert"></div><button class="btn">${ic('mega',18)} Опубликовать всем студентам</button></form></div>
+  <div class="card"><div class="card-h"><h2>Опубликовано</h2></div><div class="list">${news.map(n=>`<div style="padding:12px 0;border-top:1px solid var(--line)"><div class="row"><span class="badge ${n.tag==='deadline'?'b-warn':'b-acc'}">${n.tag==='deadline'?'Дедлайн':'Новость'}</span><span class="tiny muted">${fmtDT(n.at)}</span></div><h3 style="margin-top:6px">${esc(n.title)}</h3><div class="small muted">${esc(n.text)}</div></div>`).join('')}</div></div></div>`},
+ async profile(u){const p=await API.profile();return profileView(p)}
+};
+after.requests=()=>{const s=$('#sq');if(s){s.oninput=()=>{state.sq=s.value;clearTimeout(s._t);s._t=setTimeout(async()=>{const pos=s.selectionStart;await route();const n=$('#sq');n.focus();n.setSelectionRange(pos,pos)},250)}}};
+after.news=()=>{const f=$('#nf');if(!f)return;let tag='news';document.querySelectorAll('#ntag button').forEach(b=>b.onclick=()=>{tag=b.dataset.t;document.querySelectorAll('#ntag button').forEach(x=>x.setAttribute('aria-pressed',x===b))});f.onsubmit=async e=>{e.preventDefault();const er=$('#nerr');er.hidden=true;try{await API.publish($('#nt').value,$('#nx').value,tag);toast('Опубликовано, студенты получили уведомление');route()}catch(err){er.textContent=err.message;er.hidden=false}}};
+
+window.addEventListener('storage',e=>{if(e.key===KEY){DB=null;load();route()}});
+load();route();
+</script>
+</body>
+</html>
